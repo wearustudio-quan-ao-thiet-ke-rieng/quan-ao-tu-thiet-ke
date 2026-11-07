@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEARU.STUDIO — Tự thiết kế áo 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue-deep: #06182b;
+  --blue-ocean: #0e4d7a;
+  --blue-bright: #2a9dd4;
+  --blue-glow: #4fd1ff;
+  --red-accent: #e63946;
+  --red-glow: #ff5a68;
+  --white: #ffffff;
+  --gray-light: #f4f7fb;
+  --gray-mid: #e2ecf5;
+  --shadow-sm: 0 4px 14px rgba(6, 24, 43, 0.08);
+  --shadow-md: 0 12px 30px rgba(6, 24, 43, 0.12);
+  --shadow-lg: 0 25px 60px rgba(6, 24, 43, 0.2);
+  --shadow-3d: 0 30px 60px -15px rgba(14, 77, 122, 0.35), 0 15px 25px -10px rgba(230, 57, 70, 0.2);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #ffffff;
+  color: var(--blue-deep);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--gray-light); }
+::-webkit-scrollbar-thumb { background: linear-gradient(var(--blue-ocean), var(--red-accent)); border-radius: 10px; }
+
+/* ============ ANIMATED BACKGROUND ============ */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -2;
+  pointer-events: none;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.35;
+  animation: floatOrb 20s infinite ease-in-out;
+}
+.orb-1 { width: 500px; height: 500px; background: var(--blue-bright); top: -150px; left: -150px; animation-delay: 0s; }
+.orb-2 { width: 400px; height: 400px; background: var(--red-accent); top: 40%; right: -150px; animation-delay: -5s; }
+.orb-3 { width: 600px; height: 600px; background: var(--blue-glow); bottom: -200px; left: 30%; animation-delay: -10s; }
+.orb-4 { width: 350px; height: 350px; background: var(--red-glow); bottom: 20%; left: -100px; animation-delay: -15s; }
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, -40px) scale(1.15); }
+  66% { transform: translate(-40px, 50px) scale(0.9); }
+}
+
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42, 157, 212, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 157, 212, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: -1;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+}
+
+/* ============ HEADER ============ */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(42, 157, 212, 0.15);
+  padding: 0.9rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  z-index: 100;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: var(--scroll-progress, 0%);
+  background: linear-gradient(90deg, var(--blue-bright), var(--red-accent));
+  transition: width 0.1s linear;
+}
+
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-decoration: none;
+  color: var(--blue-deep);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.logo::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--blue-bright), var(--red-accent));
+  box-shadow: 0 0 20px rgba(230, 57, 70, 0.5);
+  animation: logoPulse 2s infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(45deg) scale(1.15); }
+}
+
+.logo em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--blue-ocean), var(--red-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo span {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: var(--blue-bright);
+  -webkit-text-fill-color: var(--blue-bright);
+}
+
+.nav {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nav a {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--blue-deep);
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  transition: all 0.25s;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--blue-bright), var(--red-accent));
+  opacity: 0;
+  transition: opacity 0.25s;
+  z-index: -1;
+}
+
+.nav a:hover { color: white; transform: translateY(-1px); }
+.nav a:hover::before { opacity: 1; }
+.nav a i { font-size: 0.85rem; transition: transform 0.25s; }
+.nav a:hover i { transform: scale(1.2) rotate(-8deg); }
+
+.login-btn {
+  background: linear-gradient(135deg, var(--blue-deep), var(--blue-ocean)) !important;
+  color: white !important;
+  padding: 0.6rem 1.4rem !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 15px rgba(14, 77, 122, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s;
+}
+
+.login-btn:hover::after { left: 100%; }
+.login-btn:hover { box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4); }
+
+/* ============ CONTAINER ============ */
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 120px 2rem 4rem;
+  min-height: 100vh;
+}
+
+.page { display: none; animation: pageIn 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.page.active { display: block; }
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ============ TYPOGRAPHY ============ */
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--blue-deep);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.8rem;
+}
+
+h1 .accent {
+  background: linear-gradient(135deg, var(--blue-bright), var(--red-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--blue-deep);
+  margin: 2rem 0 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.subhead {
+  color: #4a6a87;
+  font-size: 1.1rem;
+  margin-bottom: 2.5rem;
+  max-width: 700px;
+}
+
+/* ============ HERO 3D ============ */
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  min-height: 70vh;
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.hero-text h1 {
+  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  margin-bottom: 1.2rem;
+}
+
+.hero-text p {
+  font-size: 1.15rem;
+  color: #4a6a87;
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ============ ÁO THẬT SVG ============ */
+.hero-3d {
+  perspective: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 500px;
+}
+
+.shirt-3d, .live-shirt {
+  width: 340px;
+  height: 400px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: shirtFloat 6s infinite ease-in-out;
+  cursor: grab;
+  transition: transform 0.1s;
+}
+
+.shirt-3d:active, .live-shirt:active { cursor: grabbing; }
+
+@keyframes shirtFloat {
+  0%, 100% { transform: translateY(0) rotateY(-12deg) rotateX(4deg); }
+  50% { transform: translateY(-20px) rotateY(12deg) rotateX(-4deg); }
+}
+
+/* Bọc SVG */
+.shirt-wrapper {
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 25px 35px rgba(6, 24, 43, 0.4));
+}
+
+.shirt-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: fill 0.4s ease;
+}
+
+/* Vùng in trên ngực áo - CHO PHÉP KÉO THẢ */
+.print-area {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 5;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  padding: 10px;
+  border: 1.5px dashed transparent;
+  border-radius: 8px;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.print-area:hover {
+  border-color: rgba(79, 209, 255, 0.6);
+  background: rgba(79, 209, 255, 0.05);
+}
+
+.print-area.dragging {
+  border-color: var(--blue-bright);
+  background: rgba(79, 209, 255, 0.1);
+  cursor: grabbing;
+}
+
+.print-area .print-icon {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+  transition: color 0.3s;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.print-area .print-text {
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  letter-spacing: 1px;
+  word-break: break-word;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: color 0.3s;
+}
+
+/* Slider điều khiển size */
+.size-control {
+  margin-top: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.8);
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid var(--gray-mid);
+}
+
+.size-control label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--blue-deep);
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.size-control input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  background: var(--gray-mid);
+  border-radius: 10px;
+  outline: none;
+  padding: 0;
+  border: none;
+}
+
+.size-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--red-accent);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(230,57,70,0.4);
+}
+
+/* Bóng đổ dưới áo */
+.shirt-shadow {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(6, 24, 43, 0.35), transparent 70%);
+  filter: blur(12px);
+  animation: shadowPulse 6s infinite ease-in-out;
+  z-index: -1;
+}
+
+@keyframes shadowPulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+  50% { transform: translateX(-50%) scale(0.85); opacity: 0.5; }
+}
+
+/* Floating tags around hero */
+.float-tag {
+  position: absolute;
+  background: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  box-shadow: var(--shadow-md);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: tagFloat 4s infinite ease-in-out;
+  z-index: 5;
+}
+
+.float-tag i { color: var(--red-accent); }
+.tag-1 { top: 10%; right: 0; animation-delay: 0s; }
+.tag-2 { bottom: 15%; left: -20px; animation-delay: -2s; }
+.tag-3 { top: 45%; right: -30px; animation-delay: -1s; }
+
+@keyframes tagFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ============ BUTTONS ============ */
+.btn {
+  position: relative;
+  background: linear-gradient(135deg, var(--blue-deep), var(--blue-ocean));
+  border: none;
+  color: white;
+  padding: 0.95rem 2rem;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(14, 77, 122, 0.3);
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--red-accent), var(--red-glow));
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 0;
+}
+
+.btn span, .btn i { position: relative; z-index: 1; }
+
+.btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(230, 57, 70, 0.4); }
+.btn:hover::before { opacity: 1; }
+
+.btn-red {
+  background: linear-gradient(135deg, var(--red-accent), var(--red-glow));
+  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.35);
+}
+.btn-red::before { background: linear-gradient(135deg, var(--blue-deep), var(--blue-ocean)); }
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--blue-deep);
+  color: var(--blue-deep);
+  box-shadow: none;
+}
+.btn-outline::before { background: linear-gradient(135deg, var(--blue-deep), var(--blue-ocean)); }
+.btn-outline:hover { color: white; }
+
+.btn-small { padding: 0.6rem 1.3rem; font-size: 0.88rem; border-radius: 10px; }
+
+/* ============ CARDS ============ */
+.grid-2, .grid-3, .grid-4 {
+  display: grid;
+  gap: 1.8rem;
+}
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 22px;
+  padding: 2rem 1.6rem;
+  border: 1px solid rgba(42, 157, 212, 0.15);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(79, 209, 255, 0.08), rgba(230, 57, 70, 0.08));
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, var(--blue-bright), var(--red-accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s;
+}
+
+.card:hover {
+  transform: translateY(-8px) rotateX(2deg);
+  border-color: var(--blue-bright);
+  box-shadow: var(--shadow-lg);
+}
+
+.card:hover::before { opacity: 1; }
+.card:hover::after { transform: scaleX(1); }
+
+.card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--blue-ocean), var(--blue-bright));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 8px 20px rgba(42, 157, 212, 0.3);
+  transition: all 0.4s;
+}
+
+.card:hover .card-icon { transform: rotate(-8deg) scale(1.1); }
+
+.card-icon i { font-size: 1.6rem; color: white; }
+
+.card h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--blue-deep);
+  margin-bottom: 0.6rem;
+}
+
+.card p { color: #4a6a87; font-size: 0.95rem; line-height: 1.6; }
+
+.price {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--red-accent);
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  display: block;
+}
+
+.price small { font-weight: 400; font-size: 0.85rem; color: #7a95ad; }
+
+/* ============ MẪU ÁO SHOP ============ */
+.shirt-card {
+  text-align: center;
+  padding: 1.5rem 1rem 1.8rem;
+  cursor: pointer;
+}
+
+.shirt-preview {
+  width: 100%;
+  height: 240px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  transition: transform 0.4s;
+}
+
+.shirt-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15));
+}
+
+.shirt-preview i {
+  font-size: 6rem;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 10px 25px rgba(0,0,0,0.3));
+  transition: transform 0.5s;
+}
+
+.shirt-card:hover .shirt-preview i { transform: scale(1.15) rotate(-6deg); }
+
+.shirt-preview.bg-1 { background: linear-gradient(135deg, #0e4d7a, #2a9dd4); }
+.shirt-preview.bg-2 { background: linear-gradient(135deg, #e63946, #ff5a68); }
+.shirt-preview.bg-3 { background: linear-gradient(135deg, #06182b, #0e4d7a); }
+.shirt-preview.bg-4 { background: linear-gradient(135deg, #2a9dd4, #4fd1ff); }
+.shirt-preview.bg-5 { background: linear-gradient(135deg, #ff5a68, #e63946); }
+.shirt-preview.bg-6 { background: linear-gradient(135deg, #0e4d7a, #e63946); }
+
+.shirt-preview i { color: white; }
+
+/* ============ TRANG TỰ THIẾT KẾ ============ */
+.design-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.design-panel {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  padding: 2rem;
+  border: 1px solid rgba(42, 157, 212, 0.15);
+  box-shadow: var(--shadow-md);
+}
+
+.form-group { margin-bottom: 1.3rem; }
+
+label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--blue-deep);
+  display: block;
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.2px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border: 2px solid var(--gray-mid);
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  background: white;
+  transition: all 0.25s;
+  color: var(--blue-deep);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--blue-bright);
+  box-shadow: 0 0 0 4px rgba(42, 157, 212, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Preview áo 3D */
+.preview-stage {
+  perspective: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 520px;
+  background: linear-gradient(135deg, #eef6fc, #f4f9fd);
+  border-radius: 24px;
+  padding: 2rem;
+  border: 2px dashed rgba(42, 157, 212, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-stage::before {
+  content: 'KÉO CHỮ ĐỂ DI CHUYỂN';
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--blue-bright);
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+.price-tag-live {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, var(--red-accent), var(--red-glow));
+  color: white;
+  padding: 0.7rem 1.8rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4);
+  transform: translateZ(40px);
+  animation: pricePulse 2s infinite;
+}
+
+@keyframes pricePulse {
+  0%, 100% { transform: translateZ(40px) scale(1); }
+  50% { transform: translateZ(40px) scale(1.05); }
+}
+
+.icon-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.icon-option {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: white;
+  border: 2px solid var(--gray-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+  color: var(--blue-ocean);
+}
+
+.icon-option:hover { border-color: var(--blue-bright); transform: translateY(-2px); }
+.icon-option.selected {
+  background: linear-gradient(135deg, var(--blue-ocean), var(--blue-bright));
+  color: white;
+  border-color: var(--blue-bright);
+  box-shadow: 0 4px 12px rgba(42, 157, 212, 0.4);
+}
+
+/* Style Picker */
+.style-picker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.style-option {
+  flex: 1;
+  min-width: 80px;
+  height: 60px;
+  border-radius: 14px;
+  background: white;
+  border: 2px solid var(--gray-mid);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5a7690;
+  gap: 4px;
+}
+
+.style-option i { font-size: 1.2rem; }
+.style-option:hover { border-color: var(--blue-bright); transform: translateY(-2px); }
+.style-option.selected {
+  background: linear-gradient(135deg, var(--blue-ocean), var(--blue-bright));
+  color: white;
+  border-color: var(--blue-bright);
+  box-shadow: 0 4px 12px rgba(42, 157, 212, 0.4);
+}
+
+/* ============ BADGE ============ */
+.badge {
+  background: linear-gradient(135deg, rgba(42, 157, 212, 0.15), rgba(230, 57, 70, 0.15));
+  color: var(--blue-ocean);
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: 1px solid rgba(42, 157, 212, 0.2);
+}
+
+.badge.red { color: var(--red-accent); }
+
+/* ============ BLOG / LOOKBOOK ============ */
+.blog-card {
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.blog-img {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-img i { font-size: 4rem; color: white; opacity: 0.9; transition: transform 0.5s; }
+.blog-card:hover .blog-img i { transform: scale(1.2) rotate(10deg); }
+
+.blog-img.g-1 { background: linear-gradient(135deg, #0e4d7a, #4fd1ff); }
+.blog-img.g-2 { background: linear-gradient(135deg, #e63946, #ff5a68); }
+.blog-img.g-3 { background: linear-gradient(135deg, #06182b, #2a9dd4); }
+.blog-img.g-4 { background: linear-gradient(135deg, #2a9dd4, #e63946); }
+.blog-img.g-5 { background: linear-gradient(135deg, #0e4d7a, #06182b); }
+.blog-img.g-6 { background: linear-gradient(135deg, #ff5a68, #4fd1ff); }
+
+.blog-body { padding: 1.5rem; }
+.blog-body h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+.blog-body p { font-size: 0.9rem; color: #5a7690; }
+.blog-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #7a95ad;
+}
+.blog-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* ============ FAQ ============ */
+.faq-item {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(42, 157, 212, 0.15);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.faq-item.open { border-color: var(--blue-bright); box-shadow: var(--shadow-md); }
+
+.faq-q {
+  padding: 1.3rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--blue-deep);
+  transition: background 0.2s;
+}
+
+.faq-q:hover { background: rgba(42, 157, 212, 0.05); }
+
+.faq-q i { color: var(--red-accent); transition: transform 0.3s; }
+.faq-item.open .faq-q i { transform: rotate(45deg); }
+
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s, padding 0.3s;
+  padding: 0 1.5rem;
+  color: #4a6a87;
+  font-size: 0.95rem;
+}
+
+.faq-item.open .faq-a { max-height: 300px; padding: 0 1.5rem 1.3rem; }
+
+/* ============ TRACK ORDER ============ */
+.track-box {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  padding: 2.5rem;
+  border: 1px solid rgba(42, 157, 212, 0.15);
+  box-shadow: var(--shadow-md);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.track-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.track-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  opacity: 0.4;
+  transition: opacity 0.4s;
+}
+
+.track-step.done { opacity: 1; }
+
+.track-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gray-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--blue-ocean);
+  transition: all 0.4s;
+}
+
+.track-step.done .track-dot {
+  background: linear-gradient(135deg, var(--blue-ocean), var(--blue-bright));
+  color: white;
+  box-shadow: 0 6px 20px rgba(42, 157, 212, 0.4);
+}
+
+.track-step.current .track-dot {
+  background: linear-gradient(135deg, var(--red-accent), var(--red-glow));
+  color: white;
+  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.5);
+  animation: dotPulse 1.5s infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.track-info h4 { font-size: 1rem; color: var(--blue-deep); margin-bottom: 0.2rem; }
+.track-info p { font-size: 0.85rem; color: #7a95ad; }
+
+/* ============ CONTACT FORM ============ */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2.5rem;
+}
+
+.info-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.2rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(42, 157, 212, 0.1);
+  transition: all 0.3s;
+}
+
+.info-item:hover { transform: translateX(5px); border-color: var(--blue-bright); }
+
+.info-item .icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--blue-ocean), var(--blue-bright));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+  font-size: 1rem;
+}
+
+.info-item h4 { font-size: 0.95rem; color: var(--blue-deep); margin-bottom: 0.2rem; }
+.info-item p { font-size: 0.9rem; color: #5a7690; }
+
+/* ============ FOOTER ============ */
+.footer {
+  background: linear-gradient(135deg, var(--blue-deep), #0a2540);
+  color: #c4d9ea;
+  padding: 3rem 2rem 1.5rem;
+  margin-top: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--blue-bright), var(--red-accent), var(--blue-bright));
+  background-size: 200% 100%;
+  animation: gradientShift 3s infinite linear;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.footer-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.footer h4 {
+  color: white;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.footer a {
+  color: #c4d9ea;
+  text-decoration: none;
+  display: block;
+  padding: 0.3rem 0;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.footer a:hover { color: var(--blue-glow); transform: translateX(4px); }
+
+.footer .logo-footer {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.footer-bottom {
+  max-width: 1300px;
+  margin: 2rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(196, 217, 234, 0.15);
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8aa8c2;
+}
+
+/* ============ MODAL ============ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 24, 43, 0.6);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 1rem;
+}
+
+.modal.show {
+  display: flex;
+  animation: modalIn 0.3s;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-box {
+  background: white;
+  border-radius: 28px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: modalBoxIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-top: 5px solid var(--red-accent);
+}
+
+@keyframes modalBoxIn {
+  from { transform: translateY(30px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-box h2 {
+  margin-top: 0;
+  font-size: 1.7rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #8da3b8;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.close-modal:hover { color: var(--red-accent); transform: rotate(90deg); }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(42, 157, 212, 0.1), rgba(230, 57, 70, 0.1));
+  padding: 0.5rem 0.6rem 0.5rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(42, 157, 212, 0.2);
+}
+
+.user-info i { color: var(--red-accent); font-size: 1.1rem; }
+.user-info span { font-weight: 600; font-size: 0.9rem; color: var(--blue-deep); }
+
+.points-badge {
+  background: linear-gradient(135deg, var(--red-accent), var(--red-glow));
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 30px;
+  margin-left: 4px;
+  box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
+}
+
+/* ============ STATS SECTION ============ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin: 3rem 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(42, 157, 212, 0.15);
+}
+
+.stat-number {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--blue-ocean), var(--red-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.stat-label { font-size: 0.9rem; color: #5a7690; margin-top: 0.5rem; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; text-align: center; }
+  .hero-text p { margin-left: auto; margin-right: auto; }
+  .hero-cta { justify-content: center; }
+  .hero-3d { min-height: 400px; }
+  .design-layout { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .float-tag { display: none; }
+}
+
+@media (max-width: 768px) {
+  .header { padding: 0.8rem 1rem; flex-wrap: wrap; }
+  .nav { gap: 0.2rem; width: 100%; justify-content: center; }
+  .nav a { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+  .container { padding: 140px 1rem 3rem; }
+  h1 { font-size: 2rem; }
+  .shirt-3d, .live-shirt { width: 240px; height: 300px; }
+  .modal-box { padding: 1.8rem; }
+  .footer-content { grid-template-columns: 1fr; text-align: center; }
+}
+
+/* ============ UTILS ============ */
+.text-center { text-align: center; }
+.mb-2 { margin-bottom: 2rem; }
+.mt-2 { margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<!-- Background effects -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+<div class="grid-overlay"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <a href="#" class="logo" onclick="showPage('about'); return false;">
+    <em>WEARU</em><span>.STUDIO</span>
+  </a>
+  <nav class="nav">
+    <a href="#" data-page="about" onclick="showPage('about'); return false;"><i class="fas fa-house"></i> Giới thiệu</a>
+    <a href="#" data-page="design" onclick="showPage('design'); return false;"><i class="fas fa-wand-magic-sparkles"></i> Tự thiết kế</a>
+    <a href="#" data-page="samples" onclick="showPage('samples'); return false;"><i class="fas fa-shirt"></i> Mẫu shop</a>
+    <a href="#" data-page="lookbook" onclick="showPage('lookbook'); return false;"><i class="fas fa-images"></i> Lookbook</a>
+    <a href="#" data-page="blog" onclick="showPage('blog'); return false;"><i class="fas fa-newspaper"></i> Blog</a>
+    <a href="#" data-page="faq" onclick="showPage('faq'); return false;"><i class="fas fa-circle-question"></i> FAQ</a>
+    <a href="#" data-page="track" onclick="showPage('track'); return false;"><i class="fas fa-truck-fast"></i> Đơn hàng</a>
+    <a href="#" data-page="contact" onclick="showPage('contact'); return false;"><i class="fas fa-headset"></i> Liên hệ</a>
+    <div id="authArea">
+      <a href="#" class="login-btn" onclick="openModal(); return false;"><i class="fas fa-user-circle"></i> Đăng nhập</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="container">
+
+  <!-- ===== TRANG GIỚI THIỆU (HERO 3D) ===== -->
+  <section id="about" class="page active">
+    <div class="hero">
+      <div class="hero-text">
+        <div class="badge red" style="margin-bottom: 1.2rem;"><i class="fas fa-fire"></i> Bộ sưu tập mới 2025</div>
+        <h1>Mặc cá tính<br><span class="accent">In dấu riêng bạn</span></h1>
+        <p>Tự thiết kế áo với công cụ 3D trực quan. Chọn font, icon, hoặc để AI gợi ý — chỉ từ <strong style="color: var(--red-accent);">149K</strong> đến <strong style="color: var(--red-accent);">349K</strong>.</p>
+        <div class="hero-cta">
+          <button class="btn" onclick="showPage('design')"><i class="fas fa-wand-magic-sparkles"></i> <span>Thiết kế ngay</span></button>
+          <button class="btn btn-outline" onclick="showPage('samples')"><i class="fas fa-shirt"></i> <span>Xem mẫu shop</span></button>
+        </div>
+      </div>
+      <div class="hero-3d" id="heroStage">
+        <div class="shirt-3d" id="heroShirt">
+          <div class="shirt-wrapper">
+            <!-- Hero SVG áo thun dáng thực tế -->
+            <svg class="shirt-svg" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+              <path d="M93 30 C93 30 60 45 30 65 C20 75 15 95 15 100 L40 125 C45 130 55 125 55 115 L55 320 C55 330 65 335 75 335 L225 335 C235 335 245 330 245 320 L245 115 C245 125 255 130 260 125 L285 100 C285 95 280 75 270 65 C240 45 207 30 207 30 C207 30 180 50 150 50 C120 50 93 30 93 30 Z" fill="#1a3a5c" stroke="#0d2233" stroke-width="2"/>
+              <path d="M93 30 Q150 65 207 30" fill="none" stroke="#0d2233" stroke-width="6"/>
+              <path d="M97 38 Q150 70 203 38" fill="none" stroke="#2a5a80" stroke-width="2" stroke-dasharray="4 3"/>
+              <path d="M75 120 Q90 200 75 310" stroke="rgba(255,255,255,0.1)" stroke-width="20" fill="none" stroke-linecap="round"/>
+              <g transform="translate(150, 160)">
+                <text x="0" y="0" text-anchor="middle" font-family="'Space Grotesk', sans-serif" font-size="22" font-weight="800" fill="#ffffff" opacity="0.95">WEARU</text>
+                <text x="0" y="18" text-anchor="middle" font-family="Inter" font-size="8" letter-spacing="4" fill="#4fd1ff" opacity="0.9">STUDIO</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="shirt-shadow"></div>
+        <div class="float-tag tag-1"><i class="fas fa-bolt"></i> Chất riêng</div>
+        <div class="float-tag tag-2"><i class="fas fa-star"></i> Chất lượng</div>
+        <div class="float-tag tag-3"><i class="fas fa-tags"></i> Từ 149K</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-number" data-count="5200">0</div>
+        <div class="stat-label">Khách hàng tin dùng</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-count="12800">0</div>
+        <div class="stat-label">Áo đã giao</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-count="350">0</div>
+        <div class="stat-label">Mẫu thiết kế</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-count="98">0</div>
+        <div class="stat-label">% Hài lòng</div>
+      </div>
+    </div>
+
+    <h2>Vì sao chọn WEARU.STUDIO?</h2>
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-cube"></i></div>
+        <h3>Thiết kế 3D</h3>
+        <p>Xem trước áo trong không gian 3D xoay 360°, cảm nhận chân thực trước khi đặt.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-robot"></i></div>
+        <h3>AI gợi ý</h3>
+        <p>Không biết bắt đầu từ đâu? AI sẽ tạo mẫu thiết kế độc đáo riêng cho bạn.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-crown"></i></div>
+        <h3>Tích điểm</h3>
+        <p>Thành viên nhận điểm mỗi đơn. Đổi voucher, quà tặng hấp dẫn.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"><i class="fas fa-medal"></i></div>
+        <h3>Chất lượng</h3>
+        <p>Cotton 100% mềm mịn, in bền màu, form chuẩn, bảo hành 1 đổi 1.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; background: linear-gradient(135deg, var(--blue-deep), var(--blue-ocean)); border-radius: 24px; padding: 2.5rem; color: white; display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: space-between; box-shadow: var(--shadow-lg);">
+      <div>
+        <h2 style="color: white; margin-top: 0;">✨ Ưu đãi thành viên mới</h2>
+        <p style="opacity: 0.9; font-size: 1.05rem;">Giảm 10% đơn đầu tiên + Miễn phí thiết kế cho đơn từ 5 áo.</p>
+      </div>
+      <button class="btn btn-red" onclick="openModal()"><i class="fas fa-gift"></i> <span>Đăng ký ngay</span></button>
+    </div>
+  </section>
+
+  <!-- ===== TRANG TỰ THIẾT KẾ 3D ===== -->
+  <section id="design" class="page">
+    <h1>Tự thiết kế áo <span class="accent">3D</span></h1>
+    <p class="subhead">Xoay áo 360°, chọn font, icon hoặc nhờ AI. Giá từ 149K – 349K.</p>
+
+    <div class="design-layout">
+      <div class="design-panel">
+        
+        <!-- CHỌN KIỂU ÁO -->
+        <div class="form-group">
+          <label>Chọn kiểu áo</label>
+          <div class="style-picker" id="stylePicker">
+            <div class="style-option selected" data-style="tshirt">
+              <i class="fas fa-tshirt"></i> Áo thun
+            </div>
+            <div class="style-option" data-style="longsleeve">
+              <i class="fas fa-tshirt"></i> Tay dài
+            </div>
+            <div class="style-option" data-style="hoodie">
+              <i class="fas fa-vest"></i> Hoodie
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Nội dung in (tối đa 20 ký tự)</label>
+          <input type="text" id="customText" placeholder="VD: WEARU.STUDIO" maxlength="20" value="WEARU">
+        </div>
+        <div class="form-group">
+          <label>Font chữ</label>
+          <select id="fontSelect">
+            <option value="'Space Grotesk', sans-serif">Space Grotesk (hiện đại)</option>
+            <option value="Inter, sans-serif">Inter (tối giản)</option>
+            <option value="Arial, sans-serif">Arial (cơ bản)</option>
+            <option value="'Courier New', monospace">Courier (cổ điển)</option>
+            <option value="Georgia, serif">Georgia (thanh lịch)</option>
+            <option value="'Brush Script MT', cursive">Brush Script (nghệ thuật)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Icon</label>
+          <div class="icon-picker" id="iconPicker">
+            <div class="icon-option selected" data-icon="fa-star"><i class="fas fa-star"></i></div>
+            <div class="icon-option" data-icon="fa-heart"><i class="fas fa-heart"></i></div>
+            <div class="icon-option" data-icon="fa-bolt"><i class="fas fa-bolt"></i></div>
+            <div class="icon-option" data-icon="fa-crown"><i class="fas fa-crown"></i></div>
+            <div class="icon-option" data-icon="fa-music"><i class="fas fa-music"></i></div>
+            <div class="icon-option" data-icon="fa-fire"><i class="fas fa-fire"></i></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Màu áo</label>
+          <select id="colorSelect">
+            <option value="#f4f7fb">Trắng tinh</option>
+            <option value="#1a3a5c" selected>Xanh biển đậm</option>
+            <option value="#0e4d7a">Xanh đại dương</option>
+            <option value="#06182b">Xanh đen</option>
+            <option value="#e63946">Đỏ cá tính</option>
+            <option value="#2a9dd4">Xanh sáng</option>
+            <option value="#1f1f1f">Đen than</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-small" onclick="updateLivePreview()"><i class="fas fa-sync"></i> <span>Cập nhật</span></button>
+          <button class="btn btn-small btn-red" onclick="aiDesign()"><i class="fas fa-robot"></i> <span>AI gợi ý</span></button>
+        </div>
+      </div>
+
+      <div class="preview-stage">
+        <div class="live-shirt" id="liveShirt">
+          <div class="shirt-wrapper">
+            <!-- SVG Áo thay đổi dựa trên kiểu được chọn -->
+            <svg class="shirt-svg" id="liveShirtSvg" viewBox="0 0 300 350" xmlns="http://www.w3.org/2000/svg">
+              <!-- Nội dung SVG sẽ được JS render dựa trên kiểu áo -->
+            </svg>
+          </div>
+          
+          <!-- Nội dung in - KÉO THẢ TỰ DO -->
+          <div class="print-area" id="printArea">
+            <i class="fas fa-star print-icon" id="liveIcon" style="color: #4fd1ff;"></i>
+            <div class="print-text" id="liveText" style="font-family: 'Space Grotesk', sans-serif; color: #ffffff; font-size: 1.5rem;">WEARU</div>
+          </div>
+        </div>
+        
+        <!-- Thanh trượt điều khiển kích thước -->
+        <div class="size-control">
+          <label><i class="fas fa-text-height"></i> Cỡ chữ</label>
+          <input type="range" id="sizeSlider" min="0.5" max="2.5" step="0.1" value="1.5" oninput="changeTextSize(this.value)">
+        </div>
+
+        <div class="price-tag-live" id="livePrice">249.000đ</div>
+      </div>
+    </div>
+
+    <div style="background: rgba(42, 157, 212, 0.08); border-radius: 18px; padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; border: 1px solid rgba(42, 157, 212, 0.2);">
+      <div><i class="fas fa-users" style="color: var(--red-accent);"></i> <strong>Cần thiết kế cho nhóm?</strong> Để lại SĐT, shop liên hệ tư vấn miễn phí.</div>
+      <button class="btn btn-red btn-small" onclick="showPage('contact')"><i class="fas fa-phone"></i> <span>Liên hệ ngay</span></button>
+    </div>
+  </section>
+
+  <!-- ===== TRANG MẪU SHOP ===== -->
+  <section id="samples" class="page">
+    <h1>Mẫu áo <span class="accent">có sẵn</span></h1>
+    <p class="subhead">Thiết kế độc quyền từ WEARU.STUDIO — Giá từ 149K đến 349K</p>
+
+    <div class="grid-4">
+      <div class="card shirt-card" onclick="showPage('design')">
+        <div class="shirt-preview bg-1"><i class="fas fa-shirt"></i></div>
+        <h3>Ocean Wave</h3>
+        <p>Form rộng, in sóng biển</p>
+        <div class="price">199K</div>
+      </div>
+      <div class="card shirt-card" onclick="showPage('design')">
+        <div class="shirt-preview bg-2"><i class="fas fa-shirt"></i></div>
+        <h3>Red Signature</h3>
+        <p>Logo đỏ nổi bật</p>
+        <div class="price">249K</div>
+      </div>
+      <div class="card shirt-card" onclick="showPage('design')">
+        <div class="shirt-preview bg-3"><i class="fas fa-shirt"></i></div>
+        <h3>Blue Minimal</h3>
+        <p>Tối giản, thanh lịch</p>
+        <div class="price">149K</div>
+      </div>
+      <div class="card shirt-card" onclick="showPage('design')">
+        <div class="shirt-preview bg-4"><i class="fas fa-shirt"></i></div>
+        <h3>Summer Vibes</h3>
+        <p>Màu sắc tươi trẻ</p>
+        <div class="price">299K</div>
+      </div>
+      <div class="card shirt-card" onclick="showPage('design')">
+        <div class="shirt-preview bg-5"><i class="fas fa-shirt"></i></div>
+        <h3>Fire Icon</h3>
+        <p>Icon lửa cá tính</p>
+        <div class="price">279K</div>
+      </div>
+      <div class="card shirt-card" onclick="showPage('design')">
+        <div class="shirt-preview bg-6"><i class="fas fa-shirt"></i></div>
+        <h3>Studio Classic</h3>
+        <p>Logo WEARU.STUDIO</p>
+        <div class="price">349K</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRANG LOOKBOOK ===== -->
+  <section id="lookbook" class="page">
+    <h1>Lookbook <span class="accent">2025</span></h1>
+    <p class="subhead">Cảm hứng phối đồ từ WEARU.STUDIO — Biển xanh & Nắng đỏ</p>
+
+    <div class="grid-3">
+      <div class="card shirt-card" style="padding: 0; overflow: hidden;">
+        <div class="shirt-preview bg-1" style="height: 300px; border-radius: 0;"><i class="fas fa-shirt" style="font-size: 7rem;"></i></div>
+        <div style="padding: 1.2rem;">
+          <span class="badge">Mùa hè</span>
+          <h3 style="margin-top: 0.6rem;">Tropical Blue Set</h3>
+          <p>Áo Ocean Wave + Quần short trắng</p>
+        </div>
+      </div>
+      <div class="card shirt-card" style="padding: 0; overflow: hidden;">
+        <div class="shirt-preview bg-2" style="height: 300px; border-radius: 0;"><i class="fas fa-shirt" style="font-size: 7rem;"></i></div>
+        <div style="padding: 1.2rem;">
+          <span class="badge red">Limited</span>
+          <h3 style="margin-top: 0.6rem;">Red Signature Look</h3>
+          <p>Áo đỏ + Jeans đen + Sneaker trắng</p>
+        </div>
+      </div>
+      <div class="card shirt-card" style="padding: 0; overflow: hidden;">
+        <div class="shirt-preview bg-3" style="height: 300px; border-radius: 0;"><i class="fas fa-shirt" style="font-size: 7rem;"></i></div>
+        <div style="padding: 1.2rem;">
+          <span class="badge">Best seller</span>
+          <h3 style="margin-top: 0.6rem;">Everyday White</h3>
+          <p>Áo trắng basic + Kaki nâu</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="mt-2">🎁 Quà tặng doanh nghiệp</h2>
+    <div class="card" style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; align-items: center;">
+      <div>
+        <h3>Đặt áo nhóm, CLB, công ty</h3>
+        <p>Thiết kế theo yêu cầu, in logo số lượng lớn. Giá chỉ từ 149K/áo. Tư vấn miễn phí.</p>
+      </div>
+      <button class="btn btn-red" onclick="showPage('contact')"><i class="fas fa-envelope"></i> <span>Yêu cầu báo giá</span></button>
+    </div>
+  </section>
+
+  <!-- ===== TRANG BLOG ===== -->
+  <section id="blog" class="page">
+    <h1>Blog <span class="accent">WEARU</span></h1>
+    <p class="subhead">Câu chuyện thời trang, mẹo phối đồ và cảm hứng thiết kế</p>
+
+    <div class="grid-3">
+      <div class="card blog-card">
+        <div class="blog-img g-1"><i class="fas fa-palette"></i></div>
+        <div class="blog-body">
+          <span class="badge">Xu hướng</span>
+          <h3 style="margin-top: 0.6rem;">5 xu hướng áo thun 2025</h3>
+          <p>Khám phá những phong cách đang lên ngôi năm nay.</p>
+          <div class="blog-meta"><span><i class="far fa-clock"></i> 5 phút đọc</span><span><i class="far fa-calendar"></i> 12/03</span></div>
+        </div>
+      </div>
+      <div class="card blog-card">
+        <div class="blog-img g-2"><i class="fas fa-lightbulb"></i></div>
+        <div class="blog-body">
+          <span class="badge red">Hướng dẫn</span>
+          <h3 style="margin-top: 0.6rem;">Cách chọn size áo chuẩn</h3>
+          <p>Bí quyết chọn size vừa vặn cho mọi dáng người.</p>
+          <div class="blog-meta"><span><i class="far fa-clock"></i> 3 phút đọc</span><span><i class="far fa-calendar"></i> 08/03</span></div>
+        </div>
+      </div>
+      <div class="card blog-card">
+        <div class="blog-img g-3"><i class="fas fa-camera"></i></div>
+        <div class="blog-body">
+          <span class="badge">Lookbook</span>
+          <h3 style="margin-top: 0.6rem;">Phối đồ với áo xanh biển</h3>
+          <p>Gợi ý mix & match cho tông xanh đại dương.</p>
+          <div class="blog-meta"><span><i class="far fa-clock"></i> 4 phút đọc</span><span><i class="far fa-calendar"></i> 01/03</span></div>
+        </div>
+      </div>
+      <div class="card blog-card">
+        <div class="blog-img g-4"><i class="fas fa-robot"></i></div>
+        <div class="blog-body">
+          <span class="badge red">Công nghệ</span>
+          <h3 style="margin-top: 0.6rem;">AI trong thiết kế thời trang</h3>
+          <p>AI đang thay đổi cách chúng ta sáng tạo trang phục.</p>
+          <div class="blog-meta"><span><i class="far fa-clock"></i> 6 phút đọc</span><span><i class="far fa-calendar"></i> 25/02</span></div>
+        </div>
+      </div>
+      <div class="card blog-card">
+        <div class="blog-img g-5"><i class="fas fa-leaf"></i></div>
+        <div class="blog-body">
+          <span class="badge">Bền vững</span>
+          <h3 style="margin-top: 0.6rem;">Thời trang thân thiện môi trường</h3>
+          <p>WEARU hướng tới sản xuất xanh và bền vững.</p>
+          <div class="blog-meta"><span><i class="far fa-clock"></i> 5 phút đọc</span><span><i class="far fa-calendar"></i> 18/02</span></div>
+        </div>
+      </div>
+      <div class="card blog-card">
+        <div class="blog-img g-6"><i class="fas fa-heart"></i></div>
+        <div class="blog-body">
+          <span class="badge red">Cộng đồng</span>
+          <h3 style="margin-top: 0.6rem;">Khách hàng nói về WEARU</h3>
+          <p>Những câu chuyện thú vị từ khách hàng thân thiết.</p>
+          <div class="blog-meta"><span><i class="far fa-clock"></i> 4 phút đọc</span><span><i class="far fa-calendar"></i> 10/02</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRANG FAQ ===== -->
+  <section id="faq" class="page">
+    <h1>Câu hỏi <span class="accent">thường gặp</span></h1>
+    <p class="subhead">Giải đáp mọi thắc mắc của bạn về sản phẩm và dịch vụ</p>
+
+    <div style="max-width: 800px;">
+      <div class="faq-item open">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Giá áo thiết kế bao nhiêu?</span><i class="fas fa-plus"></i></div>
+        <div class="faq-a">Giá dao động từ 149K đến 349K tùy mẫu áo và độ phức tạp của thiết kế. Áo basic từ 149K, áo có thiết kế phức tạp hoặc phiên bản giới hạn lên đến 349K.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Thời gian giao hàng bao lâu?</span><i class="fas fa-plus"></i></div>
+        <div class="faq-a">Đơn hàng có sẵn: 1-2 ngày làm việc. Đơn thiết kế riêng: 3-5 ngày làm việc (chưa tính thời gian vận chuyển). Giao toàn quốc.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Có được đổi trả không?</span><i class="fas fa-plus"></i></div>
+        <div class="faq-a">Có! WEARU bảo hành 1 đổi 1 trong 7 ngày nếu lỗi từ nhà sản xuất (in lỗi, đường may lỗi, sai size). Vui lòng giữ nguyên tem mác.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Tích điểm như thế nào?</span><i class="fas fa-plus"></i></div>
+        <div class="faq-a">Đăng nhập tài khoản, mỗi đơn hàng nhận điểm tương ứng giá trị. Điểm dùng để đổi voucher giảm giá hoặc quà tặng. Tích càng nhiều, ưu đãi càng lớn.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Đặt áo nhóm có ưu đãi gì?</span><i class="fas fa-plus"></i></div>
+        <div class="faq-a">Đơn từ 5 áo: giảm 10% + miễn phí thiết kế. Đơn từ 20 áo: giảm 15% + tặng kèm quà. Liên hệ hotline để được báo giá chi tiết.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Tôi có thể tự thiết kế trên web không?</span><i class="fas fa-plus"></i></div>
+        <div class="faq-a">Hoàn toàn được! Vào trang "Tự thiết kế", chọn font, nhập nội dung, thêm icon và xem trước áo 3D. Hoặc nhấn "AI gợi ý" để được tạo mẫu tự động.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRANG TRACK ORDER ===== -->
+  <section id="track" class="page">
+    <h1>Kiểm tra <span class="accent">đơn hàng</span></h1>
+    <p class="subhead">Nhập mã đơn hàng để xem trạng thái vận chuyển</p>
+
+    <div class="track-box">
+      <div class="form-group">
+        <label>Mã đơn hàng</label>
+        <input type="text" id="orderCode" placeholder="VD: WRU12345">
+      </div>
+      <button class="btn" style="width: 100%; justify-content: center;" onclick="trackOrder()"><i class="fas fa-magnifying-glass"></i> <span>Tra cứu</span></button>
+
+      <div class="track-steps" id="trackSteps" style="display: none;">
+        <div class="track-step done">
+          <div class="track-dot"><i class="fas fa-check"></i></div>
+          <div class="track-info"><h4>Đã xác nhận</h4><p>Đơn hàng đã được tiếp nhận</p></div>
+        </div>
+        <div class="track-step done">
+          <div class="track-dot"><i class="fas fa-check"></i></div>
+          <div class="track-info"><h4>Đang sản xuất</h4><p>Áo đang được in và hoàn thiện</p></div>
+        </div>
+        <div class="track-step current">
+          <div class="track-dot"><i class="fas fa-truck"></i></div>
+          <div class="track-info"><h4>Đang giao hàng</h4><p>Đơn vị vận chuyển đang giao đến bạn</p></div>
+        </div>
+        <div class="track-step">
+          <div class="track-dot"><i class="fas fa-box"></i></div>
+          <div class="track-info"><h4>Đã giao</h4><p>Hoàn tất — Cảm ơn bạn!</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRANG LIÊN HỆ ===== -->
+  <section id="contact" class="page">
+    <h1>Liên hệ <span class="accent">WEARU</span></h1>
+    <p class="subhead">Để lại SĐT, shop sẽ gọi lại tư vấn trong 15 phút</p>
+
+    <div class="contact-grid">
+      <div class="design-panel">
+        <h3 style="margin-bottom: 1.2rem;"><i class="fas fa-paper-plane" style="color: var(--red-accent);"></i> Gửi yêu cầu tư vấn</h3>
+        <div class="form-group">
+          <label>Họ tên</label>
+          <input type="text" id="contactName" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="form-group">
+          <label>Số điện thoại <span style="color: var(--red-accent);">*</span></label>
+          <input type="tel" id="contactPhone" placeholder="0912 345 678">
+        </div>
+        <div class="form-group">
+          <label>Loại yêu cầu</label>
+          <select id="contactType">
+            <option>Thiết kế áo cá nhân</option>
+            <option>Thiết kế áo nhóm / CLB</option>
+            <option>Quà tặng doanh nghiệp</option>
+            <option>Tư vấn size & chất liệu</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nội dung</label>
+          <textarea id="contactNote" rows="3" placeholder="VD: Cần thiết kế 20 áo cho CLB, in logo..."></textarea>
+        </div>
+        <button class="btn btn-red" style="width: 100%; justify-content: center;" onclick="submitContact()"><i class="fas fa-check-circle"></i> <span>Gửi yêu cầu</span></button>
+        <p id="contactMsg" style="margin-top: 12px; color: var(--blue-ocean); font-weight: 600;"></p>
+      </div>
+
+      <div>
+        <div class="info-item">
+          <div class="icon"><i class="fas fa-location-dot"></i></div>
+          <div><h4>Địa chỉ</h4><p>123 Đường Biển Xanh, Q.1, TP.HCM</p></div>
+        </div>
+        <div class="info-item">
+          <div class="icon"><i class="fas fa-clock"></i></div>
+          <div><h4>Giờ mở cửa</h4><p>9:00 – 21:00 (Thứ 2 – Thứ 7)</p></div>
+        </div>
+        <div class="info-item">
+          <div class="icon"><i class="fas fa-phone"></i></div>
+          <div><h4>Hotline</h4><p>0909 123 456</p></div>
+        </div>
+        <div class="info-item">
+          <div class="icon"><i class="fas fa-envelope"></i></div>
+          <div><h4>Email</h4><p>hello@wearu.studio</p></div>
+        </div>
+        <div class="info-item" style="background: linear-gradient(135deg, rgba(230,57,70,0.1), rgba(42,157,212,0.1));">
+          <div class="icon" style="background: linear-gradient(135deg, var(--red-accent), var(--red-glow));"><i class="fas fa-users"></i></div>
+          <div><h4>Thiết kế cho nhóm từ 5 áo</h4><p>Giảm 10% + miễn phí thiết kế</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-content">
+    <div>
+      <div class="logo-footer">WEARU.STUDIO</div>
+      <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Tự thiết kế – Chất riêng – Giá tốt</p>
+      <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+        <a href="#" style="display: inline-flex;"><i class="fab fa-facebook"></i></a>
+        <a href="#" style="display: inline-flex;"><i class="fab fa-instagram"></i></a>
+        <a href="#" style="display: inline-flex;"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+    <div>
+      <h4>Sản phẩm</h4>
+      <a href="#" onclick="showPage('samples'); return false;">Mẫu có sẵn</a>
+      <a href="#" onclick="showPage('design'); return false;">Tự thiết kế</a>
+      <a href="#" onclick="showPage('lookbook'); return false;">Lookbook</a>
+    </div>
+    <div>
+      <h4>Hỗ trợ</h4>
+      <a href="#" onclick="showPage('faq'); return false;">FAQ</a>
+      <a href="#" onclick="showPage('track'); return false;">Kiểm tra đơn</a>
+      <a href="#" onclick="showPage('contact'); return false;">Liên hệ</a>
+    </div>
+    <div>
+      <h4>Liên hệ</h4>
+      <a href="tel:0909123456"><i class="fas fa-phone"></i> 0909 123 456</a>
+      <a href="mailto:hello@wearu.studio"><i class="fas fa-envelope"></i> hello@wearu.studio</a>
+      <a href="#"><i class="fas fa-location-dot"></i> Q.1, TP.HCM</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 WEARU.STUDIO. All rights reserved. Made with 💙 in Vietnam.</div>
+</footer>
+
+<!-- ============ MODAL ĐĂNG NHẬP ============ -->
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+    <h2><i class="fas fa-user-circle" style="color: var(--red-accent);"></i> Đăng nhập</h2>
+    <p style="color: #7a95ad; font-size: 0.9rem; margin-bottom: 1.5rem;">Đăng nhập để tích điểm và nhận ưu đãi</p>
+    <div class="form-group">
+      <label>Số điện thoại</label>
+      <input type="tel" id="loginPhone" placeholder="0912 345 678">
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="loginPass" placeholder="••••••">
+    </div>
+    <button class="btn" style="width: 100%; justify-content: center;" onclick="login()"><i class="fas fa-sign-in-alt"></i> <span>Đăng nhập</span></button>
+    <p style="text-align: center; margin-top: 1.2rem; font-size: 0.9rem; color: #7a95ad;">Chưa có tài khoản? <a href="#" onclick="alert('Vui lòng để lại SĐT ở trang Liên hệ để được hỗ trợ đăng ký!'); return false;" style="color: var(--red-accent); font-weight: 600;">Đăng ký ngay</a></p>
+    <p style="text-align: center; font-size: 0.78rem; color: #a8bccf; margin-top: 0.5rem;">(Demo: nhập bất kỳ SĐT & mật khẩu)</p>
+  </div>
+</div>
+
+<script>
+/* ============ STATE ============ */
+let currentUser = null;
+let points = 0;
+let selectedIcon = 'fa-star';
+let currentStyle = 'tshirt'; // tshirt, longsleeve, hoodie
+
+/* ============ SVG ÁO DỰA THEO STYLE ============ */
+const shirtSVGs = {
+  // 1. ÁO THUN (Dựa trên hình ảnh thực tế - tay ngắn, cổ tròn)
+  tshirt: `
+    <path d="M 95 30 C 95 30 60 45 30 65 C 20 75 15 95 15 100 L 40 125 C 45 130 55 125 55 115 L 55 320 C 55 330 65 335 75 335 L 225 335 C 235 335 245 330 245 320 L 245 115 C 245 125 255 130 260 125 L 285 100 C 285 95 280 75 270 65 C 240 45 205 30 205 30 C 205 30 180 50 150 50 C 120 50 95 30 95 30 Z" fill="#1a3a5c" stroke="#0d2233" stroke-width="2" class="shirt-body-path"/>
+    <path d="M 95 30 Q 150 65 205 30" fill="none" stroke="#0d2233" stroke-width="6"/>
+    <path d="M 99 38 Q 150 70 201 38" fill="none" stroke="#2a5a80" stroke-width="2" stroke-dasharray="4 3"/>
+    <!-- Nếp gấp tay áo -->
+    <path d="M 30 70 Q 40 100 50 115" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+    <path d="M 270 70 Q 260 100 250 115" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+    <path d="M 55 115 Q 70 140 65 180" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="15"/>
+    <path d="M 245 115 Q 230 140 235 180" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="15"/>
+    <path d="M 75 120 Q 90 200 75 310" stroke="rgba(255,255,255,0.12)" stroke-width="20" fill="none" stroke-linecap="round"/>
+  `,
+  
+  // 2. TAY DÀI (Dựa trên form áo thun, kéo dài tay áo xuống và thêm gân tay)
+  longsleeve: `
+    <path d="M 95 30 C 95 30 60 45 30 65 C 20 75 15 95 15 100 L 40 125 C 45 130 55 125 55 115 L 55 335 C 55 345 65 350 75 350 L 225 350 C 235 350 245 345 245 335 L 245 115 C 245 125 255 130 260 125 L 285 100 C 285 95 280 75 270 65 C 240 45 205 30 205 30 C 205 30 180 50 150 50 C 120 50 95 30 95 30 Z" fill="#1a3a5c" stroke="#0d2233" stroke-width="2" class="shirt-body-path"/>
+    <path d="M 95 30 Q 150 65 205 30" fill="none" stroke="#0d2233" stroke-width="6"/>
+    <path d="M 99 38 Q 150 70 201 38" fill="none" stroke="#2a5a80" stroke-width="2" stroke-dasharray="4 3"/>
+    <!-- Đường may tay dài -->
+    <path d="M 25 100 Q 20 200 30 340" fill="none" stroke="#0d2233" stroke-width="2" stroke-dasharray="4 4" opacity="0.5"/>
+    <path d="M 275 100 Q 280 200 270 340" fill="none" stroke="#0d2233" stroke-width="2" stroke-dasharray="4 4" opacity="0.5"/>
+    <!-- Gân cổ tay -->
+    <path d="M 55 320 Q 55 335 75 335" fill="none" stroke="#0d2233" stroke-width="3" opacity="0.6"/>
+    <path d="M 245 320 Q 245 335 225 335" fill="none" stroke="#0d2233" stroke-width="3" opacity="0.6"/>
+    <path d="M 75 120 Q 90 200 75 310" stroke="rgba(255,255,255,0.12)" stroke-width="20" fill="none" stroke-linecap="round"/>
+  `,
+
+  // 3. HOODIE (Dựa trên hình ảnh thực tế - mũ trùm, dây rút, túi kangaroo)
+  hoodie: `
+    <!-- Thân áo -->
+    <path d="M 95 40 C 95 40 60 55 30 75 C 20 85 15 105 15 110 L 40 135 C 45 140 55 135 55 125 L 55 345 C 55 355 65 360 75 360 L 225 360 C 235 360 245 355 245 345 L 245 125 C 245 135 255 140 260 135 L 285 110 C 285 105 280 85 270 75 C 240 55 205 40 205 40 C 205 40 180 60 150 60 C 120 60 95 40 95 40 Z" fill="#1a3a5c" stroke="#0d2233" stroke-width="2" class="shirt-body-path"/>
+    <!-- Mũ trùm -->
+    <path d="M 95 40 C 95 40 60 15 150 15 C 240 15 205 40 205 40 C 205 40 180 60 150 60 C 120 60 95 40 95 40 Z" fill="#0d2233" stroke="#0d2233" stroke-width="2"/>
+    <path d="M 105 45 Q 150 25 195 45" fill="none" stroke="#2a5a80" stroke-width="2" stroke-dasharray="4 3"/>
+    <!-- Dây rút -->
+    <path d="M 130 50 L 130 100" fill="none" stroke="#4fd1ff" stroke-width="3"/>
+    <path d="M 170 50 L 170 100" fill="none" stroke="#4fd1ff" stroke-width="3"/>
+    <circle cx="130" cy="102" r="4" fill="#0d2233"/>
+    <circle cx="170" cy="102" r="4" fill="#0d2233"/>
+    <!-- Túi Kangaroo -->
+    <path d="M 85 240 L 215 240 L 225 310 Q 225 320 215 320 L 85 320 Q 75 320 75 310 Z" fill="#0d2233" opacity="0.5"/>
+    <path d="M 85 240 L 100 320" fill="none" stroke="#1a3a5c" stroke-width="2"/>
+    <path d="M 215 240 L 200 320" fill="none" stroke="#1a3a5c" stroke-width="2"/>
+    <!-- Gân áo -->
+    <path d="M 55 340 Q 150 350 245 340" fill="none" stroke="#0d2233" stroke-width="4" opacity="0.6"/>
+    <path d="M 75 130 Q 90 200 75 320" stroke="rgba(255,255,255,0.1)" stroke-width="20" fill="none" stroke-linecap="round"/>
+  `
+};
+
+function renderShirt(style) {
+  const svg = document.getElementById('liveShirtSvg');
+  // Reset SVG nội dung
+  svg.innerHTML = shirtSVGs[style] || shirtSVGs.tshirt;
+  
+  // Áp dụng màu hiện tại cho áo
+  const color = document.getElementById('colorSelect').value;
+  const paths = svg.querySelectorAll('.shirt-body-path');
+  paths.forEach(p => p.setAttribute('fill', color));
+  
+  // Cập nhật ID cho path đầu tiên để sau này đổi màu
+  if (paths.length > 0) paths[0].id = 'liveShirtBody';
+}
+
+/* ============ NAV ============ */
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById(pageId);
+  if (page) page.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('header').style.setProperty('--scroll-progress', '0%');
+}
+
+/* ============ MODAL ============ */
+function openModal() { document.getElementById('loginModal').classList.add('show'); }
+function closeModal() { document.getElementById('loginModal').classList.remove('show'); }
+
+function login() {
+  const phone = document.getElementById('loginPhone').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  if (!phone || !pass) { alert('Vui lòng nhập số điện thoại và mật khẩu.'); return; }
+  currentUser = { phone: phone, points: 120 };
+  points = currentUser.points;
+  updateAuthArea();
+  closeModal();
+  alert(`Chào mừng ${phone}! Bạn có ${points} điểm tích lũy.`);
+  document.getElementById('loginPhone').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function logout() {
+  currentUser = null;
+  points = 0;
+  updateAuthArea();
+}
+
+function updateAuthArea() {
+  const authDiv = document.getElementById('authArea');
+  if (currentUser) {
+    authDiv.innerHTML = `
+      <div class="user-info">
+        <i class="fas fa-user-circle"></i>
+        <span>${currentUser.phone}</span>
+        <span class="points-badge">${points} điểm</span>
+        <a href="#" onclick="logout(); return false;" style="color: var(--red-accent); font-size: 0.8rem; margin-left: 4px;"><i class="fas fa-sign-out-alt"></i></a>
+      </div>`;
+  } else {
+    authDiv.innerHTML = `<a href="#" class="login-btn" onclick="openModal(); return false;"><i class="fas fa-user-circle"></i> Đăng nhập</a>`;
+  }
+}
+
+/* ============ PREVIEW 3D UPDATE ============ */
+function updateLivePreview() {
+  const text = document.getElementById('customText').value || 'WEARU';
+  const font = document.getElementById('fontSelect').value;
+  const icon = selectedIcon;
+  const color = document.getElementById('colorSelect').value;
+
+  const liveText = document.getElementById('liveText');
+  const liveIcon = document.getElementById('liveIcon');
+
+  liveText.textContent = text;
+  liveText.style.fontFamily = font;
+  liveIcon.className = `fas ${icon} print-icon`;
+
+  // Đổi màu áo
+  const paths = document.querySelectorAll('#liveShirtSvg .shirt-body-path');
+  paths.forEach(p => p.setAttribute('fill', color));
+
+  const isLight = color === '#f4f7fb' || color === '#ffffff';
+  liveText.style.color = isLight ? '#06182b' : '#ffffff';
+  liveIcon.style.color = isLight ? '#e63946' : '#4fd1ff';
+
+  // Cập nhật giá
+  let basePrice = 149000;
+  if (currentStyle === 'longsleeve') basePrice = 199000;
+  if (currentStyle === 'hoodie') basePrice = 249000;
+  const price = basePrice + text.length * 8000;
+  document.getElementById('livePrice').textContent = price.toLocaleString('vi-VN') + 'đ';
+}
+
+/* Đổi cỡ chữ */
+function changeTextSize(val) {
+  document.getElementById('liveText').style.fontSize = val + 'rem';
+  document.getElementById('liveIcon').style.fontSize = (parseFloat(val) * 0.93) + 'rem';
+}
+
+/* Style picker */
+document.querySelectorAll('.style-option').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.style-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    currentStyle = el.dataset.style;
+    renderShirt(currentStyle);
+    updateLivePreview();
+  });
+});
+
+/* Icon picker */
+document.querySelectorAll('.icon-option').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedIcon = el.dataset.icon;
+    updateLivePreview();
+  });
+});
+
+/* AI Design */
+function aiDesign() {
+  const fonts = [
+    "'Space Grotesk', sans-serif", 'Inter, sans-serif', 'Arial, sans-serif',
+    "'Courier New', monospace", 'Georgia, serif', "'Brush Script MT', cursive"
+  ];
+  const icons = ['fa-star', 'fa-heart', 'fa-bolt', 'fa-crown', 'fa-music', 'fa-fire'];
+  const texts = ['WEARU', 'OCEAN', 'RED VIBE', 'BLUE SOUL', 'STUDIO 25', 'TỰ TIN', 'WAVE', 'DREAM'];
+  const colors = ['#1a3a5c', '#0e4d7a', '#06182b', '#e63946', '#f4f7fb', '#2a9dd4', '#1f1f1f'];
+  const randomFont = fonts[Math.floor(Math.random() * fonts.length)];
+  const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+  const randomText = texts[Math.floor(Math.random() * texts.length)];
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+  document.getElementById('fontSelect').value = randomFont;
+  document.getElementById('customText').value = randomText;
+  document.getElementById('colorSelect').value = randomColor;
+  document.querySelectorAll('.icon-option').forEach(o => o.classList.toggle('selected', o.dataset.icon === randomIcon));
+  selectedIcon = randomIcon;
+  updateLivePreview();
+
+  // Reset vị trí về giữa khi AI tạo mới
+  const printArea = document.getElementById('printArea');
+  printArea.style.left = '50%';
+  printArea.style.top = '30%';
+  printArea.style.transform = 'translate(-50%, -50%)';
+
+  alert('🤖 AI đã tạo thiết kế mới cho bạn!');
+}
+
+/* ============ KÉO THẢ VÀ DI CHUYỂN CHỮ ============ */
+const printArea = document.getElementById('printArea');
+let isDragging = false;
+let startX, startY, startLeft, startTop;
+
+printArea.addEventListener('mousedown', (e) => {
+  if (e.target.closest('input')) return;
+  isDragging = true;
+  printArea.classList.add('dragging');
+  startX = e.clientX;
+  startY = e.clientY;
+  
+  const rect = printArea.getBoundingClientRect();
+  const parentRect = printArea.parentElement.getBoundingClientRect();
+  startLeft = rect.left - parentRect.left;
+  startTop = rect.top - parentRect.top;
+  
+  printArea.style.transform = 'none';
+  printArea.style.left = startLeft + 'px';
+  printArea.style.top = startTop + 'px';
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  printArea.style.left = (startLeft + dx) + 'px';
+  printArea.style.top = (startTop + dy) + 'px';
+});
+
+window.addEventListener('mouseup', () => {
+  if (isDragging) {
+    isDragging = false;
+    printArea.classList.remove('dragging');
+  }
+});
+
+// Hỗ trợ cảm ứng trên mobile
+printArea.addEventListener('touchstart', (e) => {
+  if (e.target.closest('input')) return;
+  isDragging = true;
+  printArea.classList.add('dragging');
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  
+  const rect = printArea.getBoundingClientRect();
+  const parentRect = printArea.parentElement.getBoundingClientRect();
+  startLeft = rect.left - parentRect.left;
+  startTop = rect.top - parentRect.top;
+  
+  printArea.style.transform = 'none';
+  printArea.style.left = startLeft + 'px';
+  printArea.style.top = startTop + 'px';
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+  if (!isDragging) return;
+  e.preventDefault();
+  const dx = e.touches[0].clientX - startX;
+  const dy = e.touches[0].clientY - startY;
+  printArea.style.left = (startLeft + dx) + 'px';
+  printArea.style.top = (startTop + dy) + 'px';
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
+  if (isDragging) {
+    isDragging = false;
+    printArea.classList.remove('dragging');
+  }
+});
+
+/* ============ FAQ ============ */
+function toggleFaq(el) {
+  const item = el.parentElement;
+  document.querySelectorAll('.faq-item').forEach(i => { if (i !== item) i.classList.remove('open'); });
+  item.classList.toggle('open');
+}
+
+/* ============ CONTACT ============ */
+function submitContact() {
+  const name = document.getElementById('contactName').value.trim();
+  const phone = document.getElementById('contactPhone').value.trim();
+  const type = document.getElementById('contactType').value;
+  const note = document.getElementById('contactNote').value.trim();
+  if (!phone) { alert('Vui lòng nhập số điện thoại!'); return; }
+  document.getElementById('contactMsg').innerHTML = `✅ Đã gửi! Shop sẽ liên hệ ${phone} trong 15 phút.`;
+  document.getElementById('contactName').value = '';
+  document.getElementById('contactPhone').value = '';
+  document.getElementById('contactNote').value = '';
+  if (currentUser) {
+    points += 10;
+    currentUser.points = points;
+    updateAuthArea();
+  }
+}
+
+/* ============ TRACK ORDER ============ */
+function trackOrder() {
+  const code = document.getElementById('orderCode').value.trim();
+  if (!code) { alert('Vui lòng nhập mã đơn hàng!'); return; }
+  document.getElementById('trackSteps').style.display = 'flex';
+  document.getElementById('trackSteps').style.flexDirection = 'column';
+}
+
+/* ============ 3D SHIRT DRAG ============ */
+function enable3DDrag(el) {
+  let isDown = false, startX = 0, startY = 0, rotY = 0, rotX = 0, currentRotY = 0, currentRotX = 0;
+
+  el.addEventListener('mousedown', e => {
+    if (e.target.closest('.print-area')) return;
+    isDown = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    el.style.animation = 'none';
+    el.style.transition = 'none';
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    rotY = currentRotY + dx * 0.5;
+    rotX = currentRotX - dy * 0.5;
+    el.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDown) return;
+    isDown = false;
+    currentRotY = rotY;
+    currentRotX = rotX;
+    el.style.transition = 'transform 0.3s ease';
+  });
+
+  el.addEventListener('touchstart', e => {
+    if (e.target.closest('.print-area')) return;
+    isDown = true;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    el.style.animation = 'none';
+    el.style.transition = 'none';
+  }, { passive: true });
+
+  window.addEventListener('touchmove', e => {
+    if (!isDown) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    rotY = currentRotY + dx * 0.5;
+    rotX = currentRotX - dy * 0.5;
+    el.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+  }, { passive: true });
+
+  window.addEventListener('touchend', () => {
+    if (!isDown) return;
+    isDown = false;
+    currentRotY = rotY;
+    currentRotX = rotX;
+    el.style.transition = 'transform 0.3s ease';
+  });
+}
+
+/* ============ SCROLL PROGRESS ============ */
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('header').style.setProperty('--scroll-progress', progress + '%');
+});
+
+/* ============ COUNTER ANIMATION ============ */
+function animateCounters() {
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count);
+    const duration = 2000;
+    const start = performance.now();
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(target * eased).toLocaleString('vi-VN') + (target >= 1000 ? '+' : '');
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+/* ============ INIT ============ */
+window.addEventListener('load', () => {
+  updateAuthArea();
+  
+  // Render áo mặc định (áo thun)
+  renderShirt('tshirt');
+  updateLivePreview();
+  
+  enable3DDrag(document.getElementById('heroShirt'));
+  enable3DDrag(document.getElementById('liveShirt'));
+  
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        animateCounters();
+        observer.disconnect();
+      }
+    });
+  });
+  observer.observe(document.querySelector('.stats-row'));
+
+  document.getElementById('customText').addEventListener('input', updateLivePreview);
+  document.getElementById('fontSelect').addEventListener('change', updateLivePreview);
+  document.getElementById('colorSelect').addEventListener('change', updateLivePreview);
+});
+
+window.addEventListener('click', e => {
+  const modal = document.getElementById('loginModal');
+  if (e.target === modal) closeModal();
+});
+</script>
+</body>
+</html>
